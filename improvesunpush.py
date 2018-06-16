@@ -9,7 +9,7 @@ from sunpush import (Position,bound,search,parse,render,print_pos)
 modifier=50
 #increment to change score by if it's 'incorrect'
 
-printing = False
+printing = True
 #whether to show boards etc as we go
 
 A1, H1, A8, H8 = 91, 98, 21, 28
@@ -24,12 +24,14 @@ def game(initial):
     global nummoves; nummoves = 0
     if printing:
         print_pos(pos)
+        print(pst)
     while nummoves<500:
         move, score = search(pos)
         pos = pos.move(move)
         nummoves += 1
         if printing:
             print_pos(pos.rotate())
+            print(pst)
         if score <= -MATE_VALUE:
             return 'black',nummoves
             break
@@ -42,6 +44,7 @@ def game(initial):
         nummoves += 1
         if printing:
             print_pos(pos)
+            print(pst)
         if score <= -MATE_VALUE:
             return 'white',nummoves
             break
