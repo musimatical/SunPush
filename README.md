@@ -2,7 +2,7 @@ PUSH CHESS RULES
 
 Push chess is a chess variant in which the rules are modified as follows:
 
-**Push**: Wherever a capture would be legal in regular chess, the piece that would be captured is instead pushed back in the direction of the original piece's movement. If this collides with another piece, it too is pushed back. If a piece is pushed off the board, it is captured.
+**Push**: Wherever a capture would be legal in regular chess, the piece that would be captured is instead pushed back in the direction of the original piece's movement (by one square, or one L-shape for the knight). If this collides with another piece, it too is pushed back. If a piece is pushed off the board, it is captured.
 
 **No Immediate Pushbacks**: If a piece has just been pushed in a given direction, it cannot immediately move/push back in the opposite direction.
 
@@ -43,3 +43,4 @@ Currently, the Sunpush AI uses position-dependent values for the King but positi
 TODO:
 - Implement promotion menu instead of assuming the choices.
 - Implement stalemate rules.
+- Implement machine learning AI
