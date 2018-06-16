@@ -1,0 +1,57 @@
+Openings:
+White move	Score	Black move
+b2a2		-1122 	d5c4
+b2b1		-610 	f5e4
+c2b1		-286 	d5e4
+c2d1		-273 	d5e4
+c2d3		-350 	d5e4
+d2c1		-75 	d5e4
+d2d1		-128 	d5e4
+d2e1		-58 	d5e4
+d2c3		-860 	e5d4
+d2d3		-340 	f5e4
+d2e3		-154 	d5e4
+e2d1 		-178 	d5e4
+e2e1 		-142 	c5b4
+e2f1 		-187 	d5e4
+e2d3 		-208 	f5e4
+e2e3 		-481 	g5f4
+e2f3 		-907 	d5e4
+f2e1 		-290 	c5b4
+f2g1 		-224 	c5b4
+f2g3 		-501 	g5f4
+g2g1 		-197 	c5b4
+g2h2 		-651 	e5f4
+b4c5 		262 	d5e4
+c4b5 		-568 	d5e4
+c4d5		331	c5d4
+d4c5		54	d5d4
+d4e5		375	c5b4
+e4f5		265	e5d4
+e4d5		454	c5b4
+f4e5		128	d5e4
+f4g5		329	f5e4
+g4f5		-365	d5e4
+
+A few e4d5 lines:
+e4d5		454	c5b4(458)	f4e5(453)	f5d5(654)
+	d2g5(1120)	d5g2(1120)	g5e7(968)
+			f7d5	f4e5(668)	d5g2	h1h8(896)
+						h8f7	b4c5(938)
+
+
+Sample game at Nodes_searched=10^6
+
+e4d5	582	d7d5	619	
+c4d5	607	c5b4	587	
+f4e5	605	e6d5	315	
+d2g5	316	d5e5	-49
+h5h3	-89	b5c4	-260
+f1g1	-261	e5e4	-1019
+d3c4	-1021	f7d5	-1898
+f2e3	-1950	e4g2	-1888
+g1f2	-1750	g2h3	-1784
+c2e4	-1751	d5e4	-1785
+e3g5	-1699	h3g3	-1743
+f5f6	-1796	h8f7	-1797
+f6g7	-1779
