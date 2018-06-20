@@ -186,6 +186,9 @@ class ChessAI_sunpush(ChessAI):
                 score -= self.pst[p.upper()][x1] - self.pst[p.upper()][x0]
             if p == 'P':
                 if A8 <= x1 <= H8:
+                    print(chessboard.board)
+                    print(move)
+                    print(A8,x1,H8)
                     score += self.pst[move[2]][x1] - self.pst['P'][x0]
             if p == 'p':
                 if A1 <= x1 <= H1:

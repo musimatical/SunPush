@@ -122,6 +122,7 @@ class ChessGUI_pygame:
 		
 	def DrawPromotion(self,board,current_color):
                 self.Draw(board,current_color,highlightSquares=[(3,3),(3,4),(4,3),(4,4)])
+                print('hi')
                 (screenX,screenY) = self.ConvertToScreenCoords((3,3))
                 self.screen.blit(self.white_queen,(screenX,screenY))
                 (screenX,screenY) = self.ConvertToScreenCoords((3,4))

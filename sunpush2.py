@@ -1,17 +1,15 @@
 #!/usr/bin/env pypy
 # -*- coding: utf-8 -*-
-
 from __future__ import print_function
+import pickle
 import re
 import sys
 from itertools import count
 from collections import OrderedDict, namedtuple
+from updatevals import update
 
 # The table size is the maximum number of elements in the transposition table.
 TABLE_SIZE = 1e8
-
-# This constant controls how much time we spend on looking for optimal moves.
-NODES_SEARCHED = 1e4
 
 # Mate value must be greater than 8*queen + 2*(rook+knight+bishop)
 # King value is set to twice this value such that if the opponent is
@@ -65,37 +63,7 @@ directions = {
 }
 alldirections = [2*N+E, N+2*E, S+2*E, 2*S+E, 2*S+W, S+2*W, N+2*W, 2*N+W,N, E, S, W, N+E, S+E, S+W, N+W]
 
-
-
-with open('PieceValues.txt','r') as doc:
-    PVals = [int(x) for x in doc.readline().partition("[")[2].partition("]")[0].split(', ')]
-    BVals = [int(x) for x in doc.readline().partition("[")[2].partition("]")[0].split(', ')]
-    NVals = [int(x) for x in doc.readline().partition("[")[2].partition("]")[0].split(', ')]
-    RVals = [int(x) for x in doc.readline().partition("[")[2].partition("]")[0].split(', ')]
-    QVals = [int(x) for x in doc.readline().partition("[")[2].partition("]")[0].split(', ')]
-    KVals = [int(x) for x in doc.readline().partition("[")[2].partition("]")[0].split(', ')]
-
-#Actually, just going to set each piece as being the same value regardless of location with the exception of the king.
-with open('OverallValues.txt','r') as doc:
-    vals = doc.readline().partition("[")[2].partition("]")[0].split(',')
-    Vals = [int(x) for x in vals]
-    PVals = [int(Vals[0]) for x in range(120)]
-    BVals = [int(Vals[1]) for x in range(120)]
-    NVals = [int(Vals[2]) for x in range(120)]
-    RVals = [int(Vals[3]) for x in range(120)]
-    QVals = [int(Vals[4]) for x in range(120)]
-
-#messy, but it gets the job done. Searches for bits between '(' and ')' and converts to int list.
-pst = {
-    'P': PVals,
-    'B': BVals,
-    'N': NVals,
-    'R': RVals,
-    'Q': QVals,
-    'K': KVals
-}
-
-
+pst=update()
 
 ###############################################################################
 # Chess logic
@@ -127,21 +95,21 @@ class Position(namedtuple('Position', 'board score oldd oldboard')):
                     if p == 'P' and d == N and q != '.': break
                     # No king pushes
                     if p == 'K' and q != '.': break
-                    if p.lower() == 'k':
-                        if self.board[j+N].lower() == 'k': break
-                        if self.board[j+W].lower() == 'k': break
-                        if self.board[j+S].lower() == 'k': break
-                        if self.board[j+E].lower() == 'k': break
-                        if self.board[j+N+W].lower() == 'k': break
-                        if self.board[j+N+E].lower() == 'k': break
-                        if self.board[j+S+W].lower() == 'k': break
-                        if self.board[j+S+E].lower() == 'k': break
+                    if p == 'K':
+                        if self.board[j+N] == 'k': break
+                        if self.board[j+W] == 'k': break
+                        if self.board[j+S] == 'k': break
+                        if self.board[j+E] == 'k': break
+                        if self.board[j+N+W] == 'k': break
+                        if self.board[j+N+E] == 'k': break
+                        if self.board[j+S+W] == 'k': break
+                        if self.board[j+S+E] == 'k': break
                     # No 'pushbacks'
                     if d == -self.oldd and self.oldboard[j] == p: break
                     # Move it
                     yield (i, j)
                     # Stop crawlers from sliding
-                    if p in ('P', 'N', 'K', 'Q'): break
+                    if p in ('P', 'N', 'K','Q'): break
                     # No sliding after captures
                     if q.islower(): break
 
@@ -179,7 +147,7 @@ class Position(namedtuple('Position', 'board score oldd oldboard')):
             if p[x] == 'P':
                 if A8 <= i[x+1] <= H8:
                     board = put(board, i[x+1], 'Q')
-            if p[x] == 'p':
+            if p[x] == 'q':
                 if A1 <= i[x+1] <= H1:
                     board = put(board, i[x+1], 'b')
         # We rotate the returned position, so it's ready for the next player
@@ -205,7 +173,7 @@ class Position(namedtuple('Position', 'board score oldd oldboard')):
             if p[x] == 'P':
                 if A8 <= i[x+1] <= H8:
                     score += pst['Q'][i[x+1]] - pst['P'][i[x]]
-            if p[x] == 'p':
+            if p[x] == 'q':
                 if A1 <= i[x+1] <= H1:
                     score -= pst['B'][i[x+1]] - pst['P'][i[x]]
         return score
@@ -277,7 +245,8 @@ def bound(pos, gamma, depth):
     return best
 
 
-def search(pos, maxn=NODES_SEARCHED):
+def search(pos, maxn):
+    pst=update()
     """ Iterative deepening MTD-bi search """
     global nodes; nodes = 0
 
@@ -340,17 +309,25 @@ def print_pos(pos):
 
 
 def main():
-    pos = Position(initial, 0, 0, initial)
+    #These four are options player can control. 
+    Difficulty='Medium' #Easy, Medium or Hard. Harder = noticeably slower.
+    playerwhite = True
+    playerblack = False
+    showscore = True #Shows AI's evaluation of the position. Usually biased in their favour.
+    
+    if playerwhite == True and playerblack == True:
+        showscore = False
+    pos = Position(initial, 0, 0, initial)# This constant controls how much time we spend on looking for optimal moves.
+    Diffs={'Hard':100000,'Medium':10000,'Easy':1000}
+    NODES_SEARCHED = Diffs[Difficulty]
     global nummoves; nummoves = 0
-    playerwhite = False
-    playerblack = True
-    showscore = True
-    movelist=[];
     while True:
         print_pos(pos)
-        # We query the user until she enters a legal move.
+        # White's turn
         move = None
         if playerwhite:
+            if nummoves==0:
+                print("Please enter moves in a format such as g8f6")
             while move not in pos.gen_moves():
                 match = re.match('([a-h][1-8])'*2, input('White move: '))
                 if match:
@@ -359,54 +336,51 @@ def main():
                     # Inform the user when invalid input (e.g. "help") is entered
                     print("Please enter a move like g8f6")
         else:
-            move, score = search(pos)
+            # Fire up AI
+            move, score = search(pos,NODES_SEARCHED)
             print("White move:", render(move[0]) + render(move[1]))
         pos = pos.move(move)
-        if not playerwhite:
-            if showscore:
-                print("Score for computer is: ",score)
+        if showscore and not playerwhite:
+            print("Score for computer is: ",score)
         nummoves += 1
-        movelist.append((render(move[0])+render(move[1])))
-        print(movelist)
         # After our move we rotate the board and print it again.
         # This allows us to see the effect of our move.
         print_pos(pos.rotate())
-
-        # Fire up the engine to look for a move.
-        move = None
-        if playerblack:
-            while move not in pos.gen_moves():
-                match = re.match('([a-h][1-8])'*2, input('Black move: '))
-                if match:
-                    move = 119-parse(match.group(1)), 119-parse(match.group(2))
-                else:
-                    # Inform the user when invalid input (e.g. "help") is entered
-                    print("Please enter a move like g8f6")
+        if 'k' not in pos[0]:
+            print("Black won in ",nummoves," moves")
+            break
+        elif 'K' not in pos[0]:
+            print("White won in ",nummoves," moves")
+            break
         else:
-            move, score = search(pos)
-            print("Black move:", render(119-move[0]) + render(119-move[1]))
-        if score <= -MATE_VALUE:
+            # Black's turn
+            move = None
+            if playerblack:
+                while move not in pos.gen_moves():
+                    match = re.match('([a-h][1-8])'*2, input('Black move: '))
+                    if match:
+                        move = 119-parse(match.group(1)), 119-parse(match.group(2))
+                    else:
+                        # Inform the user when invalid input (e.g. "help") is entered
+                        print("Please enter a move like g8f6")
+            else:
+                move, score = search(pos,NODES_SEARCHED)
+                print("Black move:", render(119-move[0]) + render(119-move[1]))
             pos = pos.move(move)
-            nummoves += 1
-            print_pos(pos)
-            print("You won in ",nummoves," moves")
-            break
-        if score >= MATE_VALUE:
-            pos = pos.move(move)
-            nummoves += 1
-            print_pos(pos)
-            print("You lost in ",nummoves," moves")
-            break
+            if 'k' not in pos[0]:
+                print_pos(pos)
+                print("White won in ",nummoves," moves")
+                break
+            if 'K' not in pos[0]:
+                print_pos(pos)
+                print("Black won in ",nummoves," moves")
+                break
 
         # The black player moves from a rotated position, so we have to
         # 'back rotate' the move before printing it.
-        pos = pos.move(move)
-        if not playerblack:
-            if showscore:
-                print("Score is: ",-score)
+        if showscore and not playerblack:
+            print("Score is: ",-score)
         nummoves += 1
-        movelist.append((render(119-move[0])+render(119-move[1])))
-        print(movelist)
 
 
 if __name__ == '__main__':

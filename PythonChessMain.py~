@@ -155,10 +155,9 @@ class PythonChessMain:
             if self.player[currentPlayerIndex].GetType() == 'AI':
                 moveTuple = self.player[currentPlayerIndex].GetMove(self.Board) 
                 if moveTuple[1] not in self.Rules.GetListOfValidMoves(self.Board,moveTuple[0]):
-                    if (moveTuple[1],moveTuple[2]) not in self.Rules.GetListOfValidMoves(self.Board,moveTuple[0]):
-                        print(moveTuple[1])
-                        print(self.Rules.DoesMovePutPlayerInCheck(self.Board,'white',moveTuple))
-                        raise TypeError('AI did an invalid move')
+                    print(moveTuple[1])
+                    print(self.Rules.DoesMovePutPlayerInCheck(self.Board,'white',moveTuple))
+                    raise TypeError('AI did an invalid move')
             else:
                 moveTuple = self.Gui.GetPlayerInput(self.Board,currentColor)
             moveReport = self.Board.MovePiece(moveTuple,currentColor) #moveReport = string like "White Bishop moves from A1 to C3" (+) "and captures ___!"

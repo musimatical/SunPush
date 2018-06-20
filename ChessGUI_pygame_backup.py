@@ -99,7 +99,7 @@ class ChessGUI_pygame:
 		
 	def ConvertToScreenCoords(self,chessSquareTuple):
 		#converts a (row,col) chessSquare into the pixel location of the upper-left corner of the square
-		row,col = chessSquareTuple[0],chessSquareTuple[1]
+		(row,col) = chessSquareTuple
 		screenX = self.boardStart_x + col*self.square_size
 		screenY = self.boardStart_y + row*self.square_size
 		return (screenX,screenY)
@@ -113,28 +113,8 @@ class ChessGUI_pygame:
 		col = (X-self.boardStart_x) / self.square_size
 		return (row,col)
 		
-
-        def ConditionalInvert(self,current_color,Tuple):
-            if current_color=='black':
-                return tuple(7-x for x in Tuple)
-            else:
-                return Tuple
 		
-	def DrawPromotion(self,board,current_color):
-                self.Draw(board,current_color,highlightSquares=[(3,3),(3,4),(4,3),(4,4)])
-                (screenX,screenY) = self.ConvertToScreenCoords((3,3))
-                self.screen.blit(self.white_queen,(screenX,screenY))
-                (screenX,screenY) = self.ConvertToScreenCoords((3,4))
-                self.screen.blit(self.white_rook,(screenX,screenY))
-                (screenX,screenY) = self.ConvertToScreenCoords((4,3))
-                self.screen.blit(self.white_knight,(screenX,screenY))
-                (screenX,screenY) = self.ConvertToScreenCoords((4,4))
-                self.screen.blit(self.white_bishop,(screenX,screenY))
-		pygame.display.flip()
-
-
-	def Draw(self,board,current_color,highlightSquares=[]):
-                if current_color=='black': board.Rotate()
+	def Draw(self,board,highlightSquares=[]):
 		self.screen.fill((0,0,0))
 		self.textBox.Draw()
 		boardSize = len(board.squares) #board should be square.  boardSize should be always 8 for chess, but I dislike "magic numbers" :)
@@ -177,6 +157,7 @@ class ChessGUI_pygame:
 				notation = chessboard_obj.ConvertToAlgebraicNotation_row(r)
 				renderedLine = self.fontDefault.render(notation,antialias,color)
 				self.screen.blit(renderedLine,(screenX,screenY))
+				
 		#highlight other squares if specified
 		for square in board.recentsquares:
 			(screenX,screenY) = self.ConvertToScreenCoords(square)
@@ -184,7 +165,7 @@ class ChessGUI_pygame:
 		
 		#highlight squares if specified
 		for square in highlightSquares:
-			(screenX,screenY) = self.ConvertToScreenCoords(self.ConditionalInvert(current_color,square))
+			(screenX,screenY) = self.ConvertToScreenCoords(square)
 			self.screen.blit(self.cyan_square,(screenX,screenY))
 
 		#draw pieces
@@ -215,12 +196,12 @@ class ChessGUI_pygame:
 					self.screen.blit(self.white_queen,(screenX,screenY))
 				if board.squares[r][c] == 'wK':
 					self.screen.blit(self.white_king,(screenX,screenY))
-		if current_color=='black': board.Rotate()
+			
 		pygame.display.flip()
 
-	def EndGame(self,board,current_color):
+	def EndGame(self,board):
 		self.PrintMessage("Press any key to exit.")
-		self.Draw(board,current_color) #draw board to show end game status
+		self.Draw(board) #draw board to show end game status
 		pygame.event.set_blocked(MOUSEMOTION)
 		while 1:
 			e = pygame.event.wait()
@@ -231,13 +212,13 @@ class ChessGUI_pygame:
 				pygame.quit()
 				break
 
-	def GetPlayerInput(self,chessboard,current_color):
+			
+	def GetPlayerInput(self,chessboard,currentColor):
 		#returns ((from_row,from_col),(to_row,to_col))
 		squares = chessboard.squares
 		fromSquareChosen = 0
 		toSquareChosen = 0
-                PromotionNeeded = 0
-		while not fromSquareChosen or not toSquareChosen or PromotionNeeded:
+		while not fromSquareChosen or not toSquareChosen:
 			squareClicked = []
 			pygame.event.set_blocked(MOUSEMOTION)
 			e = pygame.event.wait()
@@ -248,7 +229,6 @@ class ChessGUI_pygame:
 			if e.type is MOUSEBUTTONDOWN:
 				(mouseX,mouseY) = pygame.mouse.get_pos()
 				squareClicked = self.ConvertToChessCoords((mouseX,mouseY))
-                                squareClicked = self.ConditionalInvert(current_color,squareClicked)
 				if squareClicked[0]<0 or squareClicked[0]>7 or squareClicked[1]<0 or squareClicked[1]>7:
 					squareClicked = [] #not a valid chess square
 			if e.type is QUIT: #the "x" kill button
@@ -258,34 +238,28 @@ class ChessGUI_pygame:
 			
 					
 			if not fromSquareChosen and not toSquareChosen:
-				self.Draw(chessboard,current_color)
+				self.Draw(chessboard)
 				if squareClicked != []:
 					(r,c) = squareClicked
-					if 'w' in chessboard.squares[r][c]:
+					if currentColor == 'black' and 'b' in squares[r][c]:
+						chessboard.Rotate()
 						if len(list(self.Rules.GetListOfValidMoves(chessboard,squareClicked)))>0:
 							fromSquareChosen = 1
 							fromTuple = squareClicked
-						#chessboard.Rotate()
-					
+					elif currentColor == 'white' and 'w' in squares[r][c]:
+						if len(list(self.Rules.GetListOfValidMoves(chessboard,squareClicked)))>0:
+							fromSquareChosen = 1
+							fromTuple = squareClicked
+						
 			elif fromSquareChosen and not toSquareChosen:
-                                #chessboard.Rotate()
-                                possibleDestinations = []
-                                PromotionSquares = []
-                                for y in self.Rules.GetListOfValidMoves(chessboard,fromTuple):
-                                    if isinstance(y[1],int):
-                                        possibleDestinations.append(y)
-                                    else:
-                                        possibleDestinations.append(y[0])
-                                        PromotionSquares.append(y[0])
-                                #chessboard.Rotate()
-				self.Draw(chessboard,current_color,possibleDestinations)
+				possibleDestinations = list(self.Rules.GetListOfValidMoves(chessboard,fromTuple))
+				self.Draw(chessboard,possibleDestinations)
 				if squareClicked != []:
 					(r,c) = squareClicked
 					if squareClicked in possibleDestinations:
 						toSquareChosen = 1
 						toTuple = squareClicked
-                                                PromotionNeeded = squareClicked in PromotionSquares
-					elif 'w' in squares[r][c]:
+					elif currentColor == 'black' and 'b' in squares[r][c]:
 						if squareClicked == fromTuple:
 							fromSquareChosen = 0
 						elif len(list(self.Rules.GetListOfValidMoves(chessboard,squareClicked)))>0:
@@ -293,21 +267,16 @@ class ChessGUI_pygame:
 							fromTuple = squareClicked
 						else:
 							fromSquareChosen = 0 #piece is of own color, but no possible moves
+					elif currentColor == 'white' and 'w' in squares[r][c]:
+						if squareClicked == fromTuple:
+							fromSquareChosen = 0
+						elif len(list(self.Rules.GetListOfValidMoves(chessboard,squareClicked)))>0:
+							fromSquareChosen = 1
+							fromTuple = squareClicked
+						else:
+							fromSquareChosen = 0
 					else: #blank square or opposite color piece not in possible destinations clicked
 						fromSquareChosen = 0
-
-                        elif fromSquareChosen and toSquareChosen and PromotionNeeded:
-                                PromotionChoices = {(3,3):'Q',(3,4):'R',(4,3):'N',(4,4):'B'}
-				self.DrawPromotion(chessboard,current_color)
-				if squareClicked != []:
-					(r,c) = squareClicked
-					if squareClicked in PromotionChoices:
-                                                return (fromTuple,toTuple,PromotionChoices[squareClicked])
-						toTuple = squareClicked
-                                                PromotionNeeded = squareClicked in PromotionSquares
-                                        else: 
-                                                toSquareChosen = 0
-                                                PromotionNeeded = False
 
 		return (fromTuple,toTuple)
 
@@ -352,6 +321,6 @@ if __name__ == "__main__":
 	validSquares = [(5,2),(1,1),(1,5),(7,6)]
 
 	game = ChessGUI_pygame()
-	game.Draw(testBoard,current_color,validSquares)
+	game.Draw(testBoard,validSquares)
 	game.TestRoutine()
 	

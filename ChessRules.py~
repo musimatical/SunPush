@@ -96,7 +96,7 @@ class ChessRules:
                       if (piece == 'P' and A8 <= x1 <= H8) or (piece == 'p' and A1 <= x1 <= H1):
                           for promotionPiece in ['Q','B','R','N']:
                               # No moving into check
-                              if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',(chessboard.ToTuple(i),chessboard.ToTuple(j),promotionPiece)): 
+                              if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',chessboard.ToTuple(i),chessboard.ToTuple(j),promotionPiece): 
                                   if not returnNumber:
                                       yield (self.ToTuple(j),promotionPiece)
                                   else:
@@ -111,7 +111,7 @@ class ChessRules:
                   #no king problems or promotions
                   else:
                       # No moving into check
-                      if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',(chessboard.ToTuple(i),chessboard.ToTuple(j))): 
+                      if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',chessboard.ToTuple(i),chessboard.ToTuple(j)): 
                           if not returnNumber:
                               yield self.ToTuple(j)
                           else:
@@ -121,10 +121,10 @@ class ChessRules:
                       break
                   if p in ('P', 'N', 'K', 'Q'): break #these pieces only move one unit, don't check further
           
-    def DoesMovePutPlayerInCheck(self,chessboard,color,moveTuple):
+    def DoesMovePutPlayerInCheck(self,chessboard,color,fromTuple,toTuple,promotion=''):
         #return False
         newboard = copy.deepcopy(chessboard)
-        newboard.MovePiece(moveTuple)
+        newboard.MovePiece((fromTuple,toTuple,promotion))
         retval = self.IsInCheck(newboard)
         return retval
 

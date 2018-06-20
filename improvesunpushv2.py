@@ -3,9 +3,8 @@
 
 from __future__ import print_function
 from random import randint
+from numpy import sign
 from sunpush import (Position,bound,search,parse,render,print_pos)
-import numpy as np
-
 
 modifier=50
 #increment to change score by if it's 'incorrect'
@@ -22,19 +21,18 @@ MATE_VALUE = 30000
 
 def game(initial,message=''):
     pos = Position(initial, 0, 0, initial)
+    maxn = 1000;
     global nummoves; nummoves = 0
     if printing:
         print_pos(pos)
         print(message)
-        print(totalvalues)
     while nummoves<200:
-        move, score = search(pos)
+        move, score = search(pos,maxn)
         pos = pos.move(move)
         nummoves += 1
         if printing:
             print_pos(pos.rotate())
-            print(message)
-            print(totalvalues)
+        print(message)
         if score <= -MATE_VALUE:
             return 'black',nummoves
             break
@@ -42,13 +40,12 @@ def game(initial,message=''):
             return 'white',nummoves       
             break
         # Fire up the engine to look for a move.
-        move, score = search(pos)
+        move, score = search(pos,maxn)
         pos = pos.move(move)
         nummoves += 1
         if printing:
             print_pos(pos)
-            print(message)
-            print(totalvalues)
+        print(message)
         if score <= -MATE_VALUE:
             return 'white',nummoves
             break
@@ -84,7 +81,7 @@ def RandomInitial():
         while valid == False:
             place = randint(0,119)
             if initial[place]==' ' and x!='K' and x!='k':
-                valid=False
+                valid=True
             elif initial[place]=='.' and not (x=='P' and A8<=place<=H8) and not (x=='p' and A1<=place<=H1):
                 if x.isupper():
                     score+=pst[x][place]
@@ -123,10 +120,10 @@ def ValueModify(Initial,score,Result,nummoves,numpieces):
     elif score < 0 and Result == 'black':
         if printing:
             print('Black won (expectedly)')
-    scalefactor = totalvalues['P']/100.0
+    scalefactor = totalvalues['P']/300.0
     for x in totalvalues:
         totalvalues[x] = int(totalvalues[x]/scalefactor)
-    totalvalues['K'] = max(60000,9*totalvalues['Q']+2*totalvalues['R']+2*totalvalues['N']+2*totalvalues['B'])
+    totalvalues['K'] = max(6000,9*totalvalues['Q']+2*totalvalues['R']+2*totalvalues['N']+2*totalvalues['B'])
     doc = open('OverallValues.txt','w')
     doc.write(str([totalvalues['P'],totalvalues['B'],totalvalues['N'],totalvalues['R'],totalvalues['Q'],totalvalues['K']]))
     doc.close()
@@ -134,11 +131,16 @@ def ValueModify(Initial,score,Result,nummoves,numpieces):
     
 
 def main():
+    try: 
+        raw_input = input
+    except NameError: 
+        pass
     unexpected = 0
     expected = 0
     tooshort = 0
     toolong = 0
-    NumberOfGamesToCheck=int(raw_input("How many puzzles would you like to create?"))
+    #NumberOfGamesToCheck=int(raw_input("How many puzzles would you like to create?"))
+    NumberOfGamesToCheck=10
     #NODES_SEARCHED=int(raw_input("What level of depth? (suggested 10^2-10^4)"))
     x=0
     while x < NumberOfGamesToCheck:
@@ -177,18 +179,19 @@ def main():
         #messy, but it gets the job done. Searches for bits between '(' and ')' and converts to int list.
         global pst        
         pst = {
-            'P': [np.sign(x)*(x+diffvals['P']) for x in PVals],
-            'B': [np.sign(x)*(x+diffvals['B']) for x in BVals],
-            'N': [np.sign(x)*(x+diffvals['N']) for x in NVals],
-            'R': [np.sign(x)*(x+diffvals['R']) for x in RVals],
-            'Q': [np.sign(x)*(x+diffvals['Q']) for x in QVals],
-            'K': [np.sign(x)*(x+diffvals['K']) for x in KVals],
+            'P': [sign(x)*(x+diffvals['P']) for x in PVals],
+            'B': [sign(x)*(x+diffvals['B']) for x in BVals],
+            'N': [sign(x)*(x+diffvals['N']) for x in NVals],
+            'R': [sign(x)*(x+diffvals['R']) for x in RVals],
+            'Q': [sign(x)*(x+diffvals['Q']) for x in QVals],
+            'K': [sign(x)*(x+diffvals['K']) for x in KVals],
         }
         doc.close()
-        #score = 100000
-        #while abs(score)>1500:
-            #Initial,score = RandomInitial()
-        Initial,score,numpieces = RandomInitial()
+        score = 100000
+        while abs(score)>1500:
+            Initial,score,numpieces  = RandomInitial()
+            print_pos(Position(Initial, 0, 0, Initial))
+            print('Score = '+str(score))
         message = '|exp='+str(expected)+'|unexp='+str(unexpected)+'|long='+str(toolong)+'|short='+str(tooshort)+'|'
         Result,nummoves = game(Initial,message)
         if Result == 'draw':

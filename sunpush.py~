@@ -4,6 +4,7 @@
 from __future__ import print_function
 import re
 import sys
+from ChessRules import ChessRules
 from itertools import count
 from collections import OrderedDict, namedtuple
 
@@ -114,36 +115,7 @@ class Position(namedtuple('Position', 'board score oldd oldboard')):
         # as defined in the 'directions' map. The rays are broken e.g. by
         # captures or immediately in case of pieces such as knights.
         for i, p in enumerate(self.board):
-            if not p.isupper(): continue
-            for d in directions[p]:
-                for j in count(i+d, d):
-                    q = self.board[j]
-                    # Stay inside the board
-                    if self.board[j].isspace(): break
-                    # No friendly captures
-                    if q.isupper(): break
-                    # Special pawn stuff
-                    if p == 'P' and d in (N+W, N+E) and q == '.': break
-                    if p == 'P' and d == N and q != '.': break
-                    # No king pushes
-                    if p == 'K' and q != '.': break
-                    if p.lower() == 'k':
-                        if self.board[j+N].lower() == 'k': break
-                        if self.board[j+W].lower() == 'k': break
-                        if self.board[j+S].lower() == 'k': break
-                        if self.board[j+E].lower() == 'k': break
-                        if self.board[j+N+W].lower() == 'k': break
-                        if self.board[j+N+E].lower() == 'k': break
-                        if self.board[j+S+W].lower() == 'k': break
-                        if self.board[j+S+E].lower() == 'k': break
-                    # No 'pushbacks'
-                    if d == -self.oldd and self.oldboard[j] == p: break
-                    # Move it
-                    yield (i, j)
-                    # Stop crawlers from sliding
-                    if p in ('P', 'N', 'K', 'Q'): break
-                    # No sliding after captures
-                    if q.islower(): break
+            return ChessRules().MoveGenerator(self.board,p,i,oldd,recent)
 
     def rotate(self):
         return Position(
