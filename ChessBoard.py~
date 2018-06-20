@@ -218,7 +218,7 @@ class ChessBoard(object):
         if color=='black':
             fromPiece_fullString=fromPiece_fullString.replace('white','black')
             toPiece_fullString=toPiece_fullString.replace('black','white')
-            moveTuple = tuple(tuple(7-x for x in y) for y in moveTuple[0,1])
+            moveTuple = tuple(tuple(7-x for x in y) for y in [moveTuple[0],moveTuple[1]])
             from_string=self.ConvertToAlgebraicNotation(moveTuple[0])
             to_string=self.ConvertToAlgebraicNotation(moveTuple[1])
         if p[1] == '.':

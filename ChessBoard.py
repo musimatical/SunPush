@@ -65,6 +65,15 @@ class ChessBoard(object):
             self.squares[5] = ['e','e','e','e','e','wP','e','e']
             self.squares[6] = ['e','e','e','e','e','e','wP','e']
             self.squares[7] = ['e','e','e','e','e','e','e','wQ']    
+        if setupType == 5:
+            self.squares[0] = ['e','e','e','e','e','e','e','e']
+            self.squares[1] = ['e','wP','e','e','e','e','e','e']
+            self.squares[2] = ['e','wK','e','e','e','e','e','e']
+            self.squares[3] = ['e','e','e','e','e','e','e','e']
+            self.squares[4] = ['e','e','e','e','e','e','e','e']
+            self.squares[5] = ['e','bK','e','e','e','e','e','e']
+            self.squares[6] = ['e','bP','e','e','e','e','e','e']
+            self.squares[7] = ['e','e','e','e','e','e','e','e']
         if setupType != 4:
             self.lastdir = 0
             self.recentsquares = []

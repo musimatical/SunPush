@@ -55,19 +55,8 @@ class ChessAI_random(ChessAI):
         #time.sleep(1)
         #print "In ChessAI_random.GetMove"
     
-        myPieces = self.GetMyPiecesWithLegalMoves(board)
-        
-        #pick a random piece, then a random legal move for that piece
-        fromTuple = myPieces[random.randint(0,len(myPieces)-1)]
-                #fromTuple = myPieces[0]
-        legalMoves = list(self.Rules.GetListOfValidMoves(board,fromTuple))
-        toTuple = legalMoves[random.randint(0,len(legalMoves)-1)]
-                #toTuple = legalMoves[0]
-        
-        moveTuple = (fromTuple,toTuple)
-            #moveTuple = tuple(tuple(7-x for x in y) for y in moveTuple)
-        
-        return moveTuple
+        moves = self.Rules.GetAllValidMoves(board)
+        return moves[random.randint(0,len(moves)-1)]
                                 
 class BoardState_sunpush(ChessBoard):
     def __init__(self,board,squares,recentsquares,lastdir,score):
@@ -186,9 +175,6 @@ class ChessAI_sunpush(ChessAI):
                 score -= self.pst[p.upper()][x1] - self.pst[p.upper()][x0]
             if p == 'P':
                 if A8 <= x1 <= H8:
-                    print(chessboard.board)
-                    print(move)
-                    print(A8,x1,H8)
                     score += self.pst[move[2]][x1] - self.pst['P'][x0]
             if p == 'p':
                 if A1 <= x1 <= H1:
