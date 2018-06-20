@@ -41,6 +41,4 @@ Currently, the Sunpush AI uses position-dependent values for the King but positi
 "openings.txt" contains information about the Sunpush AI's evaluation of different openings (although it should be noted this was evaluated before the **Queen nerf** rule was introduced).
 
 TODO:
-- Implement promotion menu instead of assuming the choices.
-- Implement stalemate rules.
 - Implement machine learning AI
