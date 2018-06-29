@@ -20,13 +20,33 @@ class ChessRules:
                 return True
         else:
             #no valid moves but not in check
+<<<<<<< HEAD
+            return len(list(self.GetAllValidMoveNumbers(game.Board))) == 0 and not self.IsInCheck(game.Board)
+=======
             return len(list(self.GetAllValidMoves(game.Board))) == 0 and not self.IsInCheck(game.Board)
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
 
 
     def IsCheckmate(self,chessboard):
         #returns true if 'color' player is in checkmate
         #Call GetListOfValidMoves for each piece of current player
         #If there aren't any valid moves for any pieces, then return true
+<<<<<<< HEAD
+        return len(list(self.GetAllValidMoveNumbers(chessboard))) == 0 and self.IsInCheck(chessboard)
+
+    #def GetAllValidMoves(self,chessboard,skipCheckTest=False):
+    #    for row in range(8):
+    #        for col in range(8):
+    #        #print(board.squares)
+    #            piece = chessboard.squares[row][col]
+    #            #Note that this function is just for white, other functions will pre-rotate the board if not.
+    #            if 'w' in piece:
+    #                for y in self.GetListOfValidMoves(chessboard,(row,col),skipCheckTest):
+    #                    if isinstance(y[1],int):
+    #                        yield ((row,col),y)
+    #                    else:
+    #                        yield((row,col),y[0],y[1])
+=======
         return len(list(self.GetAllValidMoves(chessboard))) == 0 and self.IsInCheck(chessboard)
 
     def GetAllValidMoves(self,chessboard,skipCheckTest=False):
@@ -41,19 +61,28 @@ class ChessRules:
                             yield ((row,col),y)
                         else:
                             yield((row,col),y[0],y[1])
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
 
     def GetAllValidMoveNumbers(self,chessboard,skipCheckTest=False):
         for x in xrange(20,100):
             piece = chessboard.board[x]
                 #Note that this function is just for white, other functions will pre-rotate the board if not.
             if piece in ['N','Q','K','P','R','B']:
+<<<<<<< HEAD
+                for y in self.GetListOfValidMoves(chessboard,x,skipCheckTest):
+=======
                 for y in self.GetListOfValidMoves(chessboard,x,skipCheckTest,returnNumber=True):
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
                     if isinstance(y,int):
                         yield (x,y)
                     else:
                         yield(x,y[0],y[1])
 
+<<<<<<< HEAD
+    def GetListOfValidMoves(self,chessboard,i,skipCheckTest=False):
+=======
     def GetListOfValidMoves(self,chessboard,i,skipCheckTest=False,returnNumber=False):
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
           #print(board,color,fromTuple,board[fromTuple[0]][fromTuple[1]])
           A1, H1, A8, H8 = 91, 98, 21, 28
           N, E, S, W = -10, 1, 10, -1
@@ -68,8 +97,11 @@ class ChessRules:
           alldirections = [2*N+E, N+2*E, S+2*E, 2*S+E, 2*S+W, S+2*W, N+2*W, 2*N+W,N, E, S, W, N+E, S+E, S+W, N+W]
 
           newboard = chessboard.board
+<<<<<<< HEAD
+=======
           if not returnNumber:
               i=self.ToNumber(i)
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
           p=newboard[i]
           if not p.isupper(): 
               raise TypeError('not an uppercase piece')
@@ -86,7 +118,11 @@ class ChessRules:
                   # No king pushes
                   if p == 'K' and q != '.': break
                   # No 'pushbacks'
+<<<<<<< HEAD
+                  if d == -chessboard.lastdir and i in chessboard.recentsquares: break
+=======
                   if d == -chessboard.lastdir and self.ToTuple(i) in chessboard.recentsquares: break
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
                   # Move it
                   x0 = i
                   x1 = j
@@ -96,11 +132,16 @@ class ChessRules:
                       if (piece == 'P' and A8 <= x1 <= H8) or (piece == 'p' and A1 <= x1 <= H1):
                           for promotionPiece in ['Q','B','R','N']:
                               # No moving into check
+<<<<<<< HEAD
+                              if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',(i,j,promotionPiece)): 
+                                  yield (j,promotionPiece)
+=======
                               if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',(chessboard.ToTuple(i),chessboard.ToTuple(j),promotionPiece)): 
                                   if not returnNumber:
                                       yield (self.ToTuple(j),promotionPiece)
                                   else:
                                       yield (j,promotionPiece)
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
                           break
                       #checking for king-on-king contact
                       if piece.lower()=='k' and newboard[x1] not in [' ','\n']:
@@ -111,11 +152,16 @@ class ChessRules:
                   #no king problems or promotions
                   else:
                       # No moving into check
+<<<<<<< HEAD
+                      if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',(i,j)): 
+                          yield j
+=======
                       if skipCheckTest or not self.DoesMovePutPlayerInCheck(chessboard,'white',(chessboard.ToTuple(i),chessboard.ToTuple(j))): 
                           if not returnNumber:
                               yield self.ToTuple(j)
                           else:
                               yield j
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
                       #all clear, add to list of moves
                   if q.islower():
                       break
@@ -123,13 +169,26 @@ class ChessRules:
           
     def DoesMovePutPlayerInCheck(self,chessboard,color,moveTuple):
         #return False
+<<<<<<< HEAD
+        newboard = ChessBoard([chessboard.board,chessboard.recentsquares,chessboard.lastdir])
+        newboard.MovePiece(moveTuple,skipsq=True)
+=======
         newboard = copy.deepcopy(chessboard)
         newboard.MovePiece(moveTuple)
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
         retval = self.IsInCheck(newboard)
         return retval
 
     def IsInCheck(self,chessboard):
         # Now we're checking for any black moves that take the king. We want to consider the opponent of "color"'s moves.
+<<<<<<< HEAD
+        chessboard.Rotate(skipsq=True)
+
+        check=False
+        for move in self.GetAllValidMoveNumbers(chessboard,skipCheckTest=True):
+            newboard = ChessBoard([chessboard.board,[],0])
+            newboard.MovePiece(move,skipsq=True)
+=======
         chessboard.Rotate()
 
         check=False
@@ -137,19 +196,27 @@ class ChessRules:
             newboard = ChessBoard();
             newboard.board = chessboard.board
             newboard.MovePiece(move)
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
             if 'k' not in newboard.board:
                 check=True
                 break
 
+<<<<<<< HEAD
+        chessboard.Rotate(skipsq=True)
+=======
         chessboard.Rotate()
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
         return check
             
     def ToTuple(self,x):
         return ChessBoard().ToTuple(x)
 
+<<<<<<< HEAD
+=======
     def ToNumber(self,x):
         return ChessBoard().ToNumber(x)
 
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
 if __name__ == "__main__":
     from ChessBoard import ChessBoard
     cb = ChessBoard()

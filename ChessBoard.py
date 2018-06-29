@@ -74,7 +74,13 @@ class ChessBoard(object):
             self.squares[5] = ['e','bK','e','e','e','e','e','e']
             self.squares[6] = ['e','bP','e','e','e','e','e','e']
             self.squares[7] = ['e','e','e','e','e','e','e','e']
+<<<<<<< HEAD
+        if isinstance(setupType,list):
+            self.board,self.recentsquares,self.lastdir = setupType
+        elif setupType != 4:
+=======
         if setupType != 4:
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
             self.lastdir = 0
             self.recentsquares = []
             self.board = self.GetPushLayout()
@@ -94,9 +100,9 @@ class ChessBoard(object):
             newTupleList.append((self.ConvertToAlgebraicNotation(move[0]),self.ConvertToAlgebraicNotation(move[1])))
         return newTupleList
     
-    def ConvertSquareListToAlgebraicNotation(self,list):
+    def ConvertSquareListToAlgebraicNotation(self,List):
         newList = []
-        for square in list:
+        for square in List:
             newList.append(self.ConvertToAlgebraicNotation(square))
         return newList
 
@@ -163,16 +169,29 @@ class ChessBoard(object):
         rows = [self.board[x:x+10] for x in xrange(20,100,10)]
         self.squares = [[piece_dict[x] for x in row if x not in ['\n',' ']] for row in rows]
     
+<<<<<<< HEAD
+    def Rotate(self,skipsq=False):
+        self.board = self.board[::-1].swapcase()
+        self.lastdir = -self.lastdir
+        self.recentsquares = [119-x for x in self.recentsquares]
+        if skipsq or not isinstance(self,SunpushBoard):
+            pass
+=======
     def Rotate(self):
         self.board = self.board[::-1].swapcase()
         self.lastdir = -self.lastdir
         self.recentsquares = [self.ToTuple(119-self.ToNumber(x)) for x in self.recentsquares]
         self.GetSquaresLayout()
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
 
     def InvertSquare(self,sq):
         return (7-sq[0],7-sq[1])
         
+<<<<<<< HEAD
+    def MovePiece(self,moveTuple,color='white',skipsq=False,getMessage=False):
+=======
     def MovePiece(self,moveTuple,color='white'):
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
         #Note that color only matters for the message component of the function.
         self.recentsquares = []
         if isinstance(moveTuple[0],int):
@@ -214,6 +233,17 @@ class ChessBoard(object):
                 board = put(board, i[x+1], moveTuple[2])
             if p[x] == 'p' and A1 <= i[x+1] <= H1:
                 board = put(board, i[x+1], moveTuple[2].lower())
+<<<<<<< HEAD
+        self.recentsquares = i
+        self.board = board
+        self.lastdir = basedirection
+
+        messageString = None
+        if getMessage:
+            moveTuple = tuple(self.ToTuple(y) for y in [moveTuple[0],moveTuple[1]])
+            fromPiece_fullString = self.GetFullString(p[0])
+            toPiece_fullString = self.GetFullString(p[1])
+=======
         self.recentsquares = [self.ToTuple(x) for x in i]
 
         self.board = board
@@ -228,15 +258,21 @@ class ChessBoard(object):
             fromPiece_fullString=fromPiece_fullString.replace('white','black')
             toPiece_fullString=toPiece_fullString.replace('black','white')
             moveTuple = tuple(tuple(7-x for x in y) for y in [moveTuple[0],moveTuple[1]])
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
             from_string=self.ConvertToAlgebraicNotation(moveTuple[0])
             to_string=self.ConvertToAlgebraicNotation(moveTuple[1])
-        if p[1] == '.':
-            messageString = fromPiece_fullString+ " moves from "+from_string+" to "+to_string
-        else:
-                    messageString = fromPiece_fullString+ " from "+from_string+" pushes "+toPiece_fullString+" at "+to_string
-        #capitalize first character of messageString
-        messageString = string.upper(messageString[0])+messageString[1:len(messageString)]
-        
+            if color=='black':
+                fromPiece_fullString=fromPiece_fullString.replace('white','black')
+                toPiece_fullString=toPiece_fullString.replace('black','white')
+                from_string=self.ConvertToAlgebraicNotation(moveTuple[0])
+                to_string=self.ConvertToAlgebraicNotation(moveTuple[1])
+            if p[1] == '.':
+                messageString = fromPiece_fullString+ " moves from "+from_string+" to "+to_string
+            else:
+                        messageString = fromPiece_fullString+ " from "+from_string+" pushes "+toPiece_fullString+" at "+to_string
+            #capitalize first character of messageString
+            messageString = string.upper(messageString[0])+messageString[1:len(messageString)]
+            
         return messageString
 
 if __name__ == "__main__":
@@ -255,3 +291,30 @@ if __name__ == "__main__":
         for c in range(8):
             print(board2[r][c]),
         print("")
+
+class SunpushBoard(ChessBoard):
+    def __init__(self,board,squares,recentsquares,lastdir,score):
+        self.board = board
+        self.squares = squares
+        self.recentsquares = recentsquares
+        self.lastdir = lastdir
+        self.score = score
+
+    def Rotate(self):
+        selfcopy = self.__copy__()
+        super(SunpushBoard,selfcopy).Rotate(skipsq=True)
+        selfcopy.score = -selfcopy.score
+        return selfcopy
+
+    def __copy__(self):
+        return SunpushBoard(self.board,self.squares,self.recentsquares,self.lastdir,self.score)
+
+    def MovePiece(self,move,ai):
+        selfcopy = self.__copy__()
+        selfcopy.score = self.score + ai.value(selfcopy,move)
+        super(SunpushBoard,selfcopy).MovePiece(move)
+        return selfcopy.Rotate()
+
+    def GetScore(self,pst):
+        self.score = sum([pst[self.board[x]][x] for x in range(20,100) if self.board[x] in ['N','Q','K','P','R','B']]) - sum([pst[self.board[x].upper()][x] for x in range(20,100) if self.board[x] in ['n','q','k','p','r','b']])
+

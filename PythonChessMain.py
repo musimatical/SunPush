@@ -141,6 +141,10 @@ class PythonChessMain:
         turnCount = 0
         movelist=[]
         while not self.Rules.IsCheckmate(self.Board) and not self.Rules.IsStalemate(self):
+<<<<<<< HEAD
+            self.Board.GetSquaresLayout()
+=======
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
             currentColor = self.player[currentPlayerIndex].GetColor()
             self.StateList.append((self.Board.board,currentColor))
             #hardcoded so that player 1 is always white
@@ -161,7 +165,12 @@ class PythonChessMain:
                         raise TypeError('AI did an invalid move')
             else:
                 moveTuple = self.Gui.GetPlayerInput(self.Board,currentColor)
+<<<<<<< HEAD
+            moveReport = self.Board.MovePiece(moveTuple,currentColor,getMessage=True) #moveReport = string like "White Bishop moves from A1 to C3" (+) "and captures ___!"
+            self.Board.GetSquaresLayout()
+=======
             moveReport = self.Board.MovePiece(moveTuple,currentColor) #moveReport = string like "White Bishop moves from A1 to C3" (+) "and captures ___!"
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
             movelist.append(moveReport+'\n')
             self.Gui.PrintMessage(moveReport)
             currentPlayerIndex = (currentPlayerIndex+1)%2 #this will cause the currentPlayerIndex to toggle between 1 and 0
@@ -171,10 +180,18 @@ class PythonChessMain:
             with open('logs/chess','w') as f:
                 f.writelines(movelist)
             self.Board.Rotate() #rotate it so that chessrules can understand it
+<<<<<<< HEAD
+            #self.Board.GetSquaresLayout()
+
+        if self.Rules.IsCheckmate(self.Board):
+            self.Board.Rotate()
+            self.Board.GetSquaresLayout()
+=======
             #print(self.Board.board)
 
         if self.Rules.IsCheckmate(self.Board):
             self.Board.Rotate()
+>>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
             self.Gui.Draw(self.Board,currentColor)
             self.Gui.PrintMessage("CHECKMATE!")
             winnerIndex = (currentPlayerIndex+1)%2
