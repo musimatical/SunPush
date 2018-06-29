@@ -9,11 +9,7 @@
  """
  
 from ChessRules import ChessRules
-<<<<<<< HEAD
 from ChessBoard import ChessBoard,SunpushBoard
-=======
-from ChessBoard import ChessBoard
->>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
 from updatevals import update
 import random
 import time
@@ -59,42 +55,9 @@ class ChessAI_random(ChessAI):
         #time.sleep(1)
         #print "In ChessAI_random.GetMove"
     
-<<<<<<< HEAD
         moves = list( self.Rules.GetAllValidMoveNumbers(board))
         return moves[random.randint(0,len(moves)-1)]
 
-=======
-        moves = list( self.Rules.GetAllValidMoves(board))
-        return moves[random.randint(0,len(moves)-1)]
-                                
-class BoardState_sunpush(ChessBoard):
-    def __init__(self,board,squares,recentsquares,lastdir,score):
-        self.board = board
-        self.squares = squares
-        self.recentsquares = recentsquares
-        self.lastdir = lastdir
-        self.score = score
-
-    def Rotate(self):
-        selfcopy = self.__copy__()
-        super(BoardState_sunpush,selfcopy).Rotate()
-        selfcopy.score = -selfcopy.score
-        return selfcopy
-
-    def __copy__(self):
-        return BoardState_sunpush(self.board,self.squares,self.recentsquares,self.lastdir,self.score)
-
-    def MovePiece(self,move,ai):
-        selfcopy = self.__copy__()
-        selfcopy.score = self.score + ai.value(selfcopy,move)
-        super(BoardState_sunpush,selfcopy).MovePiece(move)
-        return selfcopy.Rotate()
-
-    def GetScore(self,pst):
-        self.score = sum([pst[self.board[x]][x] for x in range(20,100) if self.board[x] in ['N','Q','K','P','R','B']]) - sum([pst[self.board[x].upper()][x] for x in range(20,100) if self.board[x] in ['n','q','k','p','r','b']])
-
-
->>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
 class ChessAI_sunpush(ChessAI):
     #For each piece, find its legal moves.
     #Find legal moves for all opponent pieces.
@@ -103,15 +66,9 @@ class ChessAI_sunpush(ChessAI):
     #Otherwise pick a random remaining move.    
     #Limitation(s): Doesn't include blocking or sacrificial moves of a lesser piece to protect better one.
 
-<<<<<<< HEAD
-    def __init__(self,name,color,Difficulty='Easy'):
-        ChessAI.__init__(self,name,color)
-        Diffs={'Hard':100000,'Medium':10000,'Easy':1000,'VeryEasy':2}
-=======
     def __init__(self,name,color,Difficulty='Medium'):
         ChessAI.__init__(self,name,color)
-        Diffs={'Hard':100000,'Medium':10000,'Easy':1000}
->>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
+        Diffs={'Hard':100000,'Medium':10000,'Easy':1000,'VeryEasy':2}
         self.NODES_SEARCHED = Diffs[Difficulty]
         self.TABLE_SIZE = 1e8
         self.MATE_VALUE = 30000
@@ -157,21 +114,10 @@ class ChessAI_sunpush(ChessAI):
         #}
 
     def GetMove(self,chessboard):
-<<<<<<< HEAD
         pos = SunpushBoard(chessboard.board,chessboard.squares,chessboard.recentsquares,chessboard.lastdir,0)
         pos.GetScore(self.pst)
         move,score = self.search(pos)
         print(score)
-=======
-        pos = BoardState_sunpush(chessboard.board,chessboard.squares,chessboard.recentsquares,chessboard.lastdir,0)
-        pos.GetScore(self.pst)
-        move,score = self.search(pos)
-        print(score)
-        move = list(move)
-        move[0] = self.Rules.ToTuple(move[0])
-        move[1] = self.Rules.ToTuple(move[1])
-        move = tuple(move)
->>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
         if self.Rules.DoesMovePutPlayerInCheck(chessboard,'white',move):
             return ChessAI_random('','').GetMove(chessboard)
         return move
