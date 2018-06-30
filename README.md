@@ -18,32 +18,29 @@ Push chess is a chess variant in which the rules are modified as follows:
 
 **Promotion**: Promotion acts as normal, with the following exception -- if you push an opponent's pawn to the back rank, then you decide how it promotes.
 
-**Initial board setup**: Using many similar principles to that of regular chess, a new starting setup has been developed to delay conflict and provide a range of development options.
-
+**Initial board setup**: The standard chess setup doesn't work with these rules, because there's a quick forced mate. Using many similar principles to that of regular chess, a new starting setup has been developed to delay conflict and provide a range of development options.
 
 ------------------------------------------------------------------------------------------------
 sunpush.py runs the original text-based interface, featuring an AI engine called Sunpush which has been modified from an existing 'Sunfish' engine designed for regular chess.
 
 PythonChessMain.py will run the game with a GUI, and the options for different AI and player configurations.
 
-The ChessAI.py file contains a random AI and a Sunpush AI. The latter imports information from the sunpush.py file.
+The ChessAI.py file contains a random AI and a Sunpush AI. The latter is mostly the same as the one in sunpush.py.
 
 Currently the biggest obstacle to readability (and probably efficiency) is that I've somewhat hybridised the conventions for notation between Sunfish and PythonChess. There's a lot of unnecessary conversion between the the PythonChess style (in which 'wK' means white king, 'e' for empty, 'bT' for black knight, etc) and the Sunfish style (with 'K' for white king, '.' for empty, 'n' for black knight, etc.)
+**UPDATE**: I'm gradually getting rid of the PythonChess style, currently it only survives in the context of (1) the GUI and (2) the initialisation of the ChessBoard. Its main benefit is readability, which is useful in these contexts, so I might leave them as is.
 
-There's also a bit of doubling up between the sunpush file and the ChessRules file, because both of them implement the push chess rules but I may have made changes to one and not the other.
+There's also a bit of doubling up between the sunpush file and the ChessRules file, because both of them implement the push chess rules but I may have made changes to one and not the other. **Fixed**
 
-improvesunpush.py worked at one point, and it let the Sunpush AI play games against itself to try to improve its weighting for how valuable different pieces are in different positions (stored in PieceValues.txt).
+improvesunpush.py worked at one point, and it let the Sunpush AI play games against itself to try to improve its weighting for how valuable different pieces are in different positions (stored in PieceValues.txt). Similarly, improvesunpushv2.py did the same thing, but it focused just on the value of pieces regardless of their position (which might actually be better because the other method seemed to "overfit" beyond the level of actual information it had). Both of these were flawed because they didn't actually update the values as they went, and I'm not convinced that the idea is worth salvaging. A proper machine-learning AI that doesn't refer to "points" like these ones do would be much better.
 
-Similarly, improvesunpushv2.py did the same thing, but it focused just on the value of pieces regardless of their position (which might actually be better because the other method seemed to "overfit" beyond the level of actual information it had).
-
-Currently, the Sunpush AI uses position-dependent values for the King but position-independent values for all other pieces (because the King is so position dependent).
+Currently, the Sunpush AI uses position-dependent values for the King and pawns but position-independent values for all other pieces.
 
 "openings.txt" contains information about the Sunpush AI's evaluation of different openings (although it should be noted this was evaluated before the **Queen nerf** rule was introduced).
 
 TODO:
-<<<<<<< HEAD
-- Implement promotion menu instead of assuming the choices.
-- Implement stalemate rules.
-=======
->>>>>>> c7ff205a0a5b327cfb67a9728d45b79aa7d8c2ba
-- Implement machine learning AI
+- Implement promotion menu instead of assuming the choices. **DONE**
+- Implement stalemate rules. **DONE**
+- Redo text in the right panel to be more useful+readable.
+- Make promotion choice occur in a pop-out window.
+- Implement machine learning AI.
