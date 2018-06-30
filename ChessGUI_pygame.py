@@ -48,6 +48,8 @@ class ChessGUI_pygame:
             self.brown_square = pygame.image.load(os.path.join("images","brown_square.png")).convert()
             self.cyan_square = pygame.image.load(os.path.join("images","cyan_square.png")).convert()
             self.red_square = pygame.image.load(os.path.join("images","red_square.png")).convert()
+            self.green_square = pygame.image.load(os.path.join("images","green_square.png")).convert()
+            self.yellow_square = pygame.image.load(os.path.join("images","yellow_square.png")).convert()
             #"convert()" is supposed to help pygame display the images faster.  It seems to mess up transparency - makes it all black!
             #And, for this chess program, the images don't need to change that fast.
             self.black_pawn = pygame.image.load(os.path.join("images","blackPawn.png")) 
@@ -68,6 +70,8 @@ class ChessGUI_pygame:
             self.brown_square = pygame.image.load(os.path.join("images","brown_square.png")).convert()
             self.cyan_square = pygame.image.load(os.path.join("images","cyan_square.png")).convert()
             self.red_square = pygame.image.load(os.path.join("images","red_square.png")).convert()
+            self.green_square = pygame.image.load(os.path.join("images","green_square.png")).convert()
+            self.yellow_square = pygame.image.load(os.path.join("images","yellow_square.png")).convert()
             
             self.black_pawn = pygame.image.load(os.path.join("images","Chess_tile_pd.png")).convert()
             self.black_pawn = pygame.transform.scale(self.black_pawn, (self.square_size,self.square_size))
@@ -128,7 +132,7 @@ class ChessGUI_pygame:
             return x
         
     def DrawPromotion(self,board,current_color):
-        self.Draw(board,current_color,highlightSquares=[(3,3),(3,4),(4,3),(4,4)])
+        self.Draw(board,current_color,highlightSquares=[54,55,64,65])
         (screenX,screenY) = self.ConvertToScreenCoords((3,3))
         self.screen.blit(self.white_queen,(screenX,screenY))
         (screenX,screenY) = self.ConvertToScreenCoords((3,4))
@@ -140,7 +144,7 @@ class ChessGUI_pygame:
         pygame.display.flip()
 
 
-    def Draw(self,board,current_color,highlightSquares=[]):
+    def Draw(self,board,current_color,highlightSquares=[],hoverSquare=[]):
         if current_color=='black': 
             board.Rotate()
             board.GetSquaresLayout()
@@ -185,15 +189,21 @@ class ChessGUI_pygame:
                 notation = chessboard_obj.ConvertToAlgebraicNotation_row(r)
                 renderedLine = self.fontDefault.render(notation,antialias,color)
                 self.screen.blit(renderedLine,(screenX,screenY))
+
         #highlight other squares if specified
         for square in board.recentsquares:
             (screenX,screenY) = self.ConvertToScreenCoords(square)
-            self.screen.blit(self.red_square,(screenX,screenY))
+            if board.board[square] not in [' ','\n']:
+                self.screen.blit(self.yellow_square,(screenX,screenY))
         
         #highlight squares if specified
         for square in highlightSquares:
             (screenX,screenY) = self.ConvertToScreenCoords(self.ConditionalInvert(current_color,square))
-            self.screen.blit(self.cyan_square,(screenX,screenY))
+            self.screen.blit(self.green_square,(screenX,screenY))
+
+        if hoverSquare!=[]:
+            (screenX,screenY) = self.ConvertToScreenCoords(self.ConditionalInvert(current_color,hoverSquare))
+            self.screen.blit(self.green_square,(screenX,screenY))
 
         #draw pieces
         for r in range(boardSize):
@@ -249,7 +259,8 @@ class ChessGUI_pygame:
         PromotionNeeded = 0
         while not fromSquareChosen or not toSquareChosen or PromotionNeeded:
             squareClicked = []
-            pygame.event.set_blocked(MOUSEMOTION)
+            squareHovered = []
+            #pygame.event.set_blocked(MOUSEMOTION)
             e = pygame.event.wait()
             if e.type is KEYDOWN:
                 if e.key is K_ESCAPE:
@@ -266,11 +277,17 @@ class ChessGUI_pygame:
             if e.type is QUIT: #the "x" kill button
                 pygame.quit()
                 sys.exit(0)
-                    
-            
-                    
+            if e.type is MOUSEMOTION:
+                (mouseX,mouseY) = pygame.mouse.get_pos()
+                squareHovered = self.ConvertToChessCoords((mouseX,mouseY))
+                squareHovered = self.ToNumber(squareHovered)
+                if not chessboard.board[squareHovered].isupper() or len(list(self.Rules.GetListOfValidMoves(chessboard,squareHovered)))==0:
+                    #don't show green hover-over unless it's our piece
+                    #extra line checks if there's any valid moves (may slow things down a bit)
+                    squareHovered = []
+
             if not fromSquareChosen and not toSquareChosen:
-                self.Draw(chessboard,current_color)
+                self.Draw(chessboard,current_color,hoverSquare=squareHovered)
                 if squareClicked != []:
                     if chessboard.board[squareClicked].isupper():
                         if len(list(self.Rules.GetListOfValidMoves(chessboard,squareClicked)))>0:
