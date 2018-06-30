@@ -44,3 +44,11 @@ TODO:
 - Redo text in the right panel to be more useful+readable.
 - Make promotion choice occur in a pop-out window.
 - Implement machine learning AI.
+- SunPush seems to not avoid mate in X even when evaluation depth exceeds X.
+- Finish consolidating the two notations.
+- Difficulty setting options on startup.
+- Implement updates to Sunfish engine (introduced since SunPush                                              started).
+
+Credits:
+Sunfish, used for engine: https://github.com/thomasahle/sunfish/
+PythonChess, used for GUI: https://www.pygame.org/project-Python+Chess-1099-.html
