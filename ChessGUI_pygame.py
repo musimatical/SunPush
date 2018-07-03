@@ -281,6 +281,7 @@ class ChessGUI_pygame:
                 (mouseX,mouseY) = pygame.mouse.get_pos()
                 squareHovered = self.ConvertToChessCoords((mouseX,mouseY))
                 squareHovered = self.ToNumber(squareHovered)
+                squareHovered = self.ConditionalInvert(current_color,squareHovered)
                 if not chessboard.board[squareHovered].isupper() or len(list(self.Rules.GetListOfValidMoves(chessboard,squareHovered)))==0:
                     #don't show green hover-over unless it's our piece
                     #extra line checks if there's any valid moves (may slow things down a bit)
